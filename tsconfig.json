@@ -1,0 +1,28 @@
+{
+  "include": ["src/**/*"],
+    "exclude": ["node_modules"],
+
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+
+    /* Basic Options */
+    "target": "es5",
+    "module": "commonjs",
+
+    // "lib": [],                             /* Specify library files to be included in the compilation. */
+    // "sourceMap": true,                     /* Generates corresponding '.map' file. */
+    "outDir": "out",
+    "rootDir": "src",
+
+    /* Strict Type-Checking Options */
+    "strict": true,
+    "strictNullChecks": true,
+
+    /* Additional Checks */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
