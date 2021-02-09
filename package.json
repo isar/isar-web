@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@babel/preset-env": "^7.12.13",
     "@babel/preset-typescript": "^7.12.13",
     "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
@@ -128,12 +129,7 @@
     "yallist": "^4.0.0"
   },
   "scripts": {
-    "test": "jest"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.[t|j]sx?$": "babel-jest"
-    }
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "repository": {
     "type": "git",

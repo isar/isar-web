@@ -25,6 +25,10 @@ export default {
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
 
+  transform: {
+    "^.+\\.[t|j]sx?$": "babel-jest"
+  },
+
   // An array of regexp pattern strings used to skip coverage collection
   // coveragePathIgnorePatterns: [
   //   "/node_modules/"

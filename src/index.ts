@@ -1,1 +1,1 @@
-console.log("hello world");
+export { db_open } from "./db_primitives";
