@@ -24,7 +24,5 @@
 
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-
-    "types": ["intern"]
   }
 }
