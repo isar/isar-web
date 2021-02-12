@@ -1,1 +1,1 @@
-export { db_open } from "./db_primitives";
+export { db_open } from "./primitives/db_primitives";
