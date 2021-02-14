@@ -20,7 +20,7 @@ const openDBs: { [name: string]: IDBDatabase } = {};
 // which will trigger a schema migration. Never decrease the version number.
 export function db_open(dbName: string, version: number, storeAttr: ObjectStore): Promise<void> {
     return new Promise(function (resolve, reject) {
-        const request = window.indexedDB.open(dbName, version);
+        const request = indexedDB.open(dbName, version);
         request.onerror = (error) => reject('Error opening database: ' + error);
         request.onsuccess = function () {
             openDBs[dbName] = request.result;

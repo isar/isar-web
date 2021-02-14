@@ -17,7 +17,7 @@ var openDBs = {};
 // which will trigger a schema migration. Never decrease the version number.
 function db_open(dbName, version, storeAttr) {
     return new Promise(function (resolve, reject) {
-        var request = window.indexedDB.open(dbName, version);
+        var request = indexedDB.open(dbName, version);
         request.onerror = function (error) { return reject('Error opening database: ' + error); };
         request.onsuccess = function () {
             openDBs[dbName] = request.result;

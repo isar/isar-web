@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "test/**/*.ts"],
     "exclude": ["node_modules"],
 
   "compilerOptions": {
@@ -7,12 +7,13 @@
 
     /* Basic Options */
     "target": "es5",
-    "module": "commonjs",
+    "module": "CommonJS",
+    "moduleResolution": "node",
 
     // "lib": [],                             /* Specify library files to be included in the compilation. */
     // "sourceMap": true,                     /* Generates corresponding '.map' file. */
     "outDir": "out",
-    "rootDir": "src",
+    "rootDir": "./",
 
     /* Strict Type-Checking Options */
     "strict": true,
@@ -23,5 +24,12 @@
 
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+
+    "allowSyntheticDefaultImports" : true,
+    "esModuleInterop" : true,
+
+    "allowJs": true,
+
+    "types": ["node"],
   }
 }
