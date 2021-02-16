@@ -42,7 +42,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("../src/index");
 var ava_1 = __importDefault(require("ava"));
 require("fake-indexeddb/auto");
-ava_1.default('DB open operation should resolve', function () { return __awaiter(void 0, void 0, void 0, function () {
+var txn;
+ava_1.default.before(function () { return __awaiter(void 0, void 0, void 0, function () {
     var indices, store;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -52,6 +53,77 @@ ava_1.default('DB open operation should resolve', function () { return __awaiter
                 return [4 /*yield*/, index_1.db_open("DB", 1, store)];
             case 1:
                 _a.sent();
+                txn = index_1.open_txn("DB", "OS", false);
+                return [2 /*return*/];
+        }
+    });
+}); });
+// Test Execution Order:
+// put #1, put #2, and put #3 run sequentially.
+// The get operations then run asynchronously (and possibly concurrently).
+ava_1.default.serial('put #1 should resolve', function () {
+    return index_1.put(txn, { id: "123", age: 12 });
+});
+ava_1.default('get (primary key from put #1) should return object from put #1', function (t) { return __awaiter(void 0, void 0, void 0, function () {
+    var data;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                t.plan(1);
+                return [4 /*yield*/, index_1.get(txn, "123")];
+            case 1:
+                data = _a.sent();
+                t.true(data.id == "123" && data.age == 12);
+                return [2 /*return*/];
+        }
+    });
+}); });
+ava_1.default.serial('put #2 (with duplicate primary key) should fail', function (t) { return __awaiter(void 0, void 0, void 0, function () {
+    var e_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, index_1.put(txn, { id: "123", age: 15 })];
+            case 1:
+                _a.sent();
+                t.fail();
+                return [3 /*break*/, 3];
+            case 2:
+                e_1 = _a.sent();
+                t.pass();
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+ava_1.default('get (primary key from put #1 & 2) should return object from put #1', function (t) { return __awaiter(void 0, void 0, void 0, function () {
+    var data;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                t.plan(1);
+                return [4 /*yield*/, index_1.get(txn, "123")];
+            case 1:
+                data = _a.sent();
+                t.true(data.id == "123" && data.age == 12);
+                return [2 /*return*/];
+        }
+    });
+}); });
+ava_1.default.serial('put #3 (with new primary key) should resolve', function () {
+    return index_1.put(txn, { id: "321", age: 13 });
+});
+ava_1.default('get (primary key from put #3) should return object from put #3', function (t) { return __awaiter(void 0, void 0, void 0, function () {
+    var data;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                t.plan(1);
+                return [4 /*yield*/, index_1.get(txn, "321")];
+            case 1:
+                data = _a.sent();
+                t.true(data.id == "321" && data.age == 13);
                 return [2 /*return*/];
         }
     });

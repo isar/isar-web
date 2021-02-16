@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get = exports.open_txn = exports.db_open = void 0;
+exports.put = exports.get = exports.open_txn = exports.db_open = void 0;
 // IndexedDB is structured like this:
 // Database: application creates databases
 // Object Stores: children of databases, with imposed schemas
@@ -25,7 +25,6 @@ function db_open(dbName, version, storeAttr) {
         };
         request.onupgradeneeded = function () {
             var db = request.result;
-            openDBs[dbName] = db;
             var store;
             if (storeAttr.key) {
                 store = db.createObjectStore(storeAttr.name, { keyPath: storeAttr.key });
@@ -37,7 +36,10 @@ function db_open(dbName, version, storeAttr) {
                 var index = storeAttr.indices[i];
                 store.createIndex(index.name, index.name, { unique: index.isUnique });
             }
-            store.transaction.oncomplete = function () { return resolve(); };
+            store.transaction.oncomplete = (function () {
+                openDBs[dbName] = db;
+                resolve();
+            });
         };
     });
 }
@@ -65,3 +67,12 @@ function get(txn, key) {
     });
 }
 exports.get = get;
+function put(txn, content) {
+    var store = txn.objectStore(txn.objectStoreNames[0]);
+    var req = store.add(content);
+    return new Promise(function (resolve, reject) {
+        req.onsuccess = function () { return resolve(); };
+        req.onerror = function () { return reject(req.error); };
+    });
+}
+exports.put = put;

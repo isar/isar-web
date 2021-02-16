@@ -21,6 +21,7 @@ const openDBs: { [name: string]: IDBDatabase } = {};
 export function db_open(dbName: string, version: number, storeAttr: ObjectStore): Promise<void> {
     return new Promise(function (resolve, reject) {
         const request = indexedDB.open(dbName, version);
+        
         request.onerror = (error) => reject('Error opening database: ' + error);
         request.onsuccess = function () {
             openDBs[dbName] = request.result;
@@ -28,7 +29,6 @@ export function db_open(dbName: string, version: number, storeAttr: ObjectStore)
         }
         request.onupgradeneeded = function () {
             const db = request.result;
-            openDBs[dbName] = db;
             let store;
             if (storeAttr.key) {
                 store = db.createObjectStore(storeAttr.name, { keyPath: storeAttr.key });
@@ -39,7 +39,10 @@ export function db_open(dbName: string, version: number, storeAttr: ObjectStore)
                 const index : Index = storeAttr.indices[i];
                 store.createIndex(index.name, index.name, { unique: index.isUnique });
             }
-            store.transaction.oncomplete = () => resolve();
+            store.transaction.oncomplete = (() => {
+                openDBs[dbName] = db;
+                resolve();
+            });
         }
     });
 }
@@ -63,6 +66,15 @@ export function get(txn: IDBTransaction, key: string | number | Date | ArrayBuff
     const req = txn.objectStore(txn.objectStoreNames[0]).get(key);
     return new Promise<unknown>((resolve, reject) => {
         req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+export function put(txn: IDBTransaction, content: Object) : Promise<void> {
+    const store = txn.objectStore(txn.objectStoreNames[0]);
+    let req = store.add(content);
+    return new Promise<void>((resolve, reject) => {
+        req.onsuccess = () => resolve();
         req.onerror = () => reject(req.error);
     });
 }
