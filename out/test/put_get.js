@@ -1,4 +1,5 @@
 "use strict";
+// Tests for the put and get operations of IndexedDB.
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -61,8 +62,9 @@ ava_1.default.beforeEach(function () {
     txn = index_1.open_txn("DB", "OS", false);
 });
 // Test Execution Order:
-// put #1, put #2, and put #3 run sequentially.
-// The get operations then run asynchronously (and possibly concurrently).
+// The before hook runs first.
+// put #1, put #2, and put #3 run sequentially, with the beforeEach hook before each.
+// The get operations then run asynchronously (and possibly concurrently), with the beforeEach hook before each.
 ava_1.default.serial('put #1 should resolve', function () {
     return index_1.put(txn, { id: "123", age: 12 });
 });
