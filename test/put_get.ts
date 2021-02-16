@@ -1,3 +1,5 @@
+// Tests for the put and get operations of IndexedDB.
+
 import { put, db_open, open_txn, Index, ObjectStore, get } from "../src/index";
 import test from 'ava';
 import 'fake-indexeddb/auto';
@@ -9,12 +11,16 @@ test.before(async () => {
     const store = new ObjectStore("OS", indices, "id");
 
     await db_open("DB", 1, store);
+});
+
+test.beforeEach(() => {
     txn = open_txn("DB", "OS", false);
 });
 
 // Test Execution Order:
-// put #1, put #2, and put #3 run sequentially.
-// The get operations then run asynchronously (and possibly concurrently).
+// The before hook runs first.
+// put #1, put #2, and put #3 run sequentially, with the beforeEach hook before each.
+// The get operations then run asynchronously (and possibly concurrently), with the beforeEach hook before each.
 
 test.serial('put #1 should resolve', () => {
     return put(txn, {id: "123", age: 12});

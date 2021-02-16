@@ -53,11 +53,13 @@ ava_1.default.before(function () { return __awaiter(void 0, void 0, void 0, func
                 return [4 /*yield*/, index_1.db_open("DB", 1, store)];
             case 1:
                 _a.sent();
-                txn = index_1.open_txn("DB", "OS", false);
                 return [2 /*return*/];
         }
     });
 }); });
+ava_1.default.beforeEach(function () {
+    txn = index_1.open_txn("DB", "OS", false);
+});
 // Test Execution Order:
 // put #1, put #2, and put #3 run sequentially.
 // The get operations then run asynchronously (and possibly concurrently).
