@@ -8,13 +8,13 @@ let txn : IDBTransaction;
 
 test.before(async () => {
     const indices = [new Index("id", true), new Index("age", false)];
-    const store = new ObjectStore("OS", indices, "id");
+    const stores = [new ObjectStore("OS", indices, "id")];
 
-    await db_open("DB", 1, store);
+    await db_open("putget", 1, stores);
 });
 
 test.beforeEach(() => {
-    txn = open_txn("DB", "OS", false);
+    txn = open_txn("putget", "OS", false);
 });
 
 // Test Execution Order:

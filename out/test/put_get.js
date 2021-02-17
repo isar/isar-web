@@ -45,13 +45,13 @@ var ava_1 = __importDefault(require("ava"));
 require("fake-indexeddb/auto");
 var txn;
 ava_1.default.before(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var indices, store;
+    var indices, stores;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 indices = [new index_1.Index("id", true), new index_1.Index("age", false)];
-                store = new index_1.ObjectStore("OS", indices, "id");
-                return [4 /*yield*/, index_1.db_open("DB", 1, store)];
+                stores = [new index_1.ObjectStore("OS", indices, "id")];
+                return [4 /*yield*/, index_1.db_open("putget", 1, stores)];
             case 1:
                 _a.sent();
                 return [2 /*return*/];
@@ -59,7 +59,7 @@ ava_1.default.before(function () { return __awaiter(void 0, void 0, void 0, func
     });
 }); });
 ava_1.default.beforeEach(function () {
-    txn = index_1.open_txn("DB", "OS", false);
+    txn = index_1.open_txn("putget", "OS", false);
 });
 // Test Execution Order:
 // The before hook runs first.

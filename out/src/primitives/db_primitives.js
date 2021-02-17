@@ -7,15 +7,12 @@ exports.put = exports.get = exports.open_txn = exports.db_open = void 0;
 //
 // Schemas + indices are imposed on object stores, not databases.
 // Source: https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
-// Currently opening a new database for each object store.
-// Opening a db is costly but more DBs increases transaction throughput and ease of schema migration.
-// TODO: Possibly inline name attributes (e.g. dbName == storeName).
 var openDBs = {};
 // Note that version MUST be an integer.
 //
 // If you want to update the schema (indices), then you should increase the version number,
 // which will trigger a schema migration. Never decrease the version number.
-function db_open(dbName, version, storeAttr) {
+function db_open(dbName, version, stores) {
     return new Promise(function (resolve, reject) {
         var request = indexedDB.open(dbName, version);
         request.onerror = function (error) { return reject('Error opening database: ' + error); };
@@ -23,23 +20,34 @@ function db_open(dbName, version, storeAttr) {
             openDBs[dbName] = request.result;
             resolve();
         };
+        var promises = [];
         request.onupgradeneeded = function () {
             var db = request.result;
-            var store;
-            if (storeAttr.key) {
-                store = db.createObjectStore(storeAttr.name, { keyPath: storeAttr.key });
+            openDBs[dbName] = db;
+            var _loop_1 = function (i) {
+                var storeAttr = stores[i];
+                var store;
+                if (storeAttr.key) {
+                    store = db.createObjectStore(storeAttr.name, { keyPath: storeAttr.key });
+                }
+                else {
+                    store = db.createObjectStore(storeAttr.name, { autoIncrement: true });
+                }
+                for (var i_1 = 0; i_1 < storeAttr.indices.length; i_1++) {
+                    var index = storeAttr.indices[i_1];
+                    store.createIndex(index.name, index.name, { unique: index.isUnique });
+                }
+                promises.push(new Promise(function (resolve, reject) {
+                    store.transaction.oncomplete = (function () {
+                        resolve();
+                    });
+                    store.transaction.onerror = function (err) { return reject(err); };
+                }));
+            };
+            for (var i = 0; i < stores.length; i++) {
+                _loop_1(i);
             }
-            else {
-                store = db.createObjectStore(storeAttr.name, { autoIncrement: true });
-            }
-            for (var i = 0; i < storeAttr.indices.length; i++) {
-                var index = storeAttr.indices[i];
-                store.createIndex(index.name, index.name, { unique: index.isUnique });
-            }
-            store.transaction.oncomplete = (function () {
-                openDBs[dbName] = db;
-                resolve();
-            });
+            Promise.all(promises).catch(function (err) { return reject(err); }).then(function () { return resolve(); });
         };
     });
 }
